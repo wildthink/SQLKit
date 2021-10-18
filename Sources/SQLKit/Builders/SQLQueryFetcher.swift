@@ -28,16 +28,21 @@ extension SQLQueryFetcher {
     
     // MARK: All
 
-
     public func all<D>(decoding: D.Type) -> [D]
         where D: Decodable
     {
-        self.all(decoding: D.self).map {
-                try $0.decode(model: D.self)
+        var all: [D] = []
+        self.run(decoding: D.self) { res in
+            switch res {
+                case .failure(let error):
+                    Swift.print(error)
+                case .success(let nob):
+                    all.append(nob)
             }
         }
+        return all
     }
-    
+
     /// Collects all raw output into an array and returns it.
     ///
     ///     builder.all()
@@ -49,7 +54,7 @@ extension SQLQueryFetcher {
         }
         return all
     }
-    
+
     // MARK: Run
 
 
